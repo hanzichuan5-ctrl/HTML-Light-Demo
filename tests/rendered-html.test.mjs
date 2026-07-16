@@ -78,6 +78,10 @@ test("keeps the light, controls, and simulation in the shipped source", async ()
   assert.match(canvas, /width < 760 \? 1\.25 : 1\.5/);
   assert.match(surface, /LIGHT_MODES/);
   assert.match(surface, /FOUND CLUE/);
+  assert.match(surface, /SEARCHING/);
+  assert.match(surface, /CLUE_DETECTION_RADIUS/);
+  assert.doesNotMatch(surface, /clue-marker/);
+  assert.doesNotMatch(surface, /inspector-light/);
   assert.match(surface, /20260716-231908\.jpg/);
   assert.match(surface, /菠萝包/);
   assert.match(surface, /さと/);

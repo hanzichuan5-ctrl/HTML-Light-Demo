@@ -46,6 +46,8 @@ const CLUES = [
   },
 ] as const;
 
+const CLUE_DETECTION_RADIUS = 13;
+
 const LIGHT_MODES = [
   {
     id: "warm",
@@ -95,23 +97,19 @@ export function MorsPageSurface({
   const titleId = preview ? "mors-title-preview" : "mors-title";
   const tabIndex = preview ? -1 : undefined;
   const stageRef = useRef<HTMLDivElement>(null);
-  const [activeClue, setActiveClue] = useState<(typeof CLUES)[number]>(CLUES[0]);
-  const [inspectPoint, setInspectPoint] = useState({ x: 42, y: 54 });
+  const [activeClue, setActiveClue] = useState<(typeof CLUES)[number] | null>(null);
 
   function moveInspector(event: PointerEvent<HTMLDivElement>) {
     const rect = stageRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
-    setInspectPoint({
-      x: Math.max(0, Math.min(100, x)),
-      y: Math.max(0, Math.min(100, y)),
-    });
-  }
+    const nearest = CLUES.map((clue) => ({
+      clue,
+      distance: Math.hypot(clue.x - x, clue.y - y),
+    })).sort((a, b) => a.distance - b.distance)[0];
 
-  function inspectClue(clue: (typeof CLUES)[number]) {
-    setActiveClue(clue);
-    setInspectPoint({ x: clue.x, y: clue.y });
+    setActiveClue(nearest.distance <= CLUE_DETECTION_RADIUS ? nearest.clue : null);
   }
 
   return (
@@ -121,8 +119,6 @@ export function MorsPageSurface({
       style={
         {
           "--lamp-color": lighting.color,
-          "--inspect-x": `${inspectPoint.x}%`,
-          "--inspect-y": `${inspectPoint.y}%`,
         } as CSSProperties
       }
     >
@@ -177,32 +173,17 @@ export function MorsPageSurface({
             data-interactive
             onPointerMove={moveInspector}
             onPointerEnter={moveInspector}
+            onPointerLeave={() => setActiveClue(null)}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`${BASE_PATH}/20260716-231908.jpg`} alt="菠萝包和さと侦探搭档" />
-            <div className="inspector-light" aria-hidden="true" />
-            {CLUES.map((clue) => (
-              <button
-                key={clue.id}
-                type="button"
-                className={`clue-marker${activeClue.id === clue.id ? " is-active" : ""}`}
-                style={{ "--clue-x": `${clue.x}%`, "--clue-y": `${clue.y}%` } as CSSProperties}
-                onClick={() => inspectClue(clue)}
-                onFocus={() => inspectClue(clue)}
-                onPointerEnter={() => inspectClue(clue)}
-                aria-label={`查看线索：${clue.name}`}
-                tabIndex={tabIndex}
-              >
-                <span />
-              </button>
-            ))}
           </div>
 
-          <aside className="clue-card" data-interactive aria-live="polite">
-            <p>FOUND CLUE</p>
-            <h2>{activeClue.name}</h2>
-            <strong>{activeClue.role}</strong>
-            <span>{activeClue.detail}</span>
+          <aside className={`clue-card${activeClue ? "" : " is-empty"}`} data-interactive aria-live="polite">
+            <p>{activeClue ? "FOUND CLUE" : "SEARCHING"}</p>
+            <h2>{activeClue?.name ?? "移动灯光寻找线索"}</h2>
+            <strong>{activeClue?.role ?? "隐藏感应中"}</strong>
+            <span>{activeClue?.detail ?? "把灯光移到菠萝包、さと、帽子或眼镜附近，线索说明会自动出现。"}</span>
           </aside>
         </section>
 
@@ -304,7 +285,7 @@ export function MorsPageSurface({
         <p>菠萝包 / さと / CASE FILE / FUN LIGHT</p>
         <div className="drag-instruction">
           <span className="drag-orbit" aria-hidden="true"><i /></span>
-          <div><b>LMB PULL · RMB LIGHT</b><span>Move over photo · Find clues</span></div>
+          <div><b>LMB PULL · RMB LIGHT</b><span>Light the photo · Reveal clues</span></div>
         </div>
         <p>BRAVE BODYGUARD — GENIUS PARTNER</p>
       </footer>
