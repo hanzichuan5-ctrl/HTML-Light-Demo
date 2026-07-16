@@ -99,5 +99,5 @@ test("keeps the GitHub Pages static deployment configured", async () => {
   assert.match(workflow, /actions\/configure-pages@v5/);
   assert.match(workflow, /actions\/upload-pages-artifact@v4/);
   assert.match(workflow, /actions\/deploy-pages@v5/);
-  assert.match(readme, /https:\/\/jinruozai\.github\.io\/HTML-Light-Demo\//);
+  assert.match(readme, /https:\/\/hanzichuan5-ctrl\.github\.io\/HTML-Light-Demo\//);
 });

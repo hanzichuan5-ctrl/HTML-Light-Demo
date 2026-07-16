@@ -6,14 +6,14 @@ An interactive **HTML-in-Canvas** lighting experiment powered by Three.js.
 
 <p><strong>An unofficial recreation of <a href="https://x.com/kaolti">@kaolti</a>'s project.</strong></p>
 
-<a href="https://jinruozai.github.io/HTML-Light-Demo/">
+<a href="https://hanzichuan5-ctrl.github.io/HTML-Light-Demo/">
   <img src="https://img.shields.io/badge/Live_Demo-Open-2ea44f?style=for-the-badge&logo=githubpages&logoColor=white" alt="Open the online demo" />
 </a>
 <a href="https://x.com/LazyGooooo">
   <img src="https://img.shields.io/badge/Follow-@LazyGooooo-000000?style=for-the-badge&logo=x&logoColor=white" alt="Follow @LazyGooooo on X" />
 </a>
 
-**[在线体验 Demo →](https://jinruozai.github.io/HTML-Light-Demo/)**
+**[在线体验 Demo →](https://hanzichuan5-ctrl.github.io/HTML-Light-Demo/)**
 
 </div>
 
@@ -55,7 +55,7 @@ time.
 Requires Node.js 22.13 or newer.
 
 ```bash
-git clone https://github.com/jinruozai/HTML-Light-Demo.git
+git clone https://github.com/hanzichuan5-ctrl/HTML-Light-Demo.git
 cd HTML-Light-Demo
 npm install
 npm run dev

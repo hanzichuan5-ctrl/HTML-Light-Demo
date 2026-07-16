@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jinruozai.github.io/HTML-Light-Demo/";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hanzichuan5-ctrl.github.io/HTML-Light-Demo/";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const publicAsset = (path: string) => new URL(`${basePath}${path}`, siteUrl).toString();
 
