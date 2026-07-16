@@ -16,33 +16,32 @@ const publicAsset = (path: string) => new URL(`${basePath}${path}`, siteUrl).toS
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "HZC Game Engine",
+    default: "HZC Detective Playroom",
     template: "%s — HZC",
   },
-  description:
-    "HZC is a small, elegant, high-performance Rust game engine architecture.",
+  description: "菠萝包和さと的侦探搭档灯光互动页面。",
   icons: {
     icon: publicAsset("/mors-logo.svg"),
     shortcut: publicAsset("/mors-logo.svg"),
   },
   openGraph: {
-    title: "HZC Game Engine",
-    description: "我是鼠鼠大王",
+    title: "HZC Detective Playroom",
+    description: "菠萝包和さと的侦探搭档灯光互动页面。",
     type: "website",
     url: siteUrl,
-    images: [{ url: publicAsset("/og.jpg"), width: 1200, height: 630, alt: "A hanging light reveals the HZC engine architecture." }],
+    images: [{ url: publicAsset("/20260716-231908.jpg"), width: 1230, height: 1230, alt: "菠萝包和さと的侦探搭档合照。" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "HZC Game Engine",
-    description: "我是鼠鼠大王",
-    images: [publicAsset("/og.jpg")],
+    title: "HZC Detective Playroom",
+    description: "菠萝包和さと的侦探搭档灯光互动页面。",
+    images: [publicAsset("/20260716-231908.jpg")],
   },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body className={notoSansJP.variable}>{children}</body>
     </html>
   );

@@ -34,7 +34,7 @@ export function MorsLightCanvas() {
   const activeColorRef = useRef(new THREE.Color());
   const wakeRef = useRef<(() => void) | null>(null);
   const resetMotionRef = useRef<(() => void) | null>(null);
-  const [concept, setConcept] = useState<Concept>("Space");
+  const [concept, setConcept] = useState<Concept>("案件");
   const [lighting, setLighting] = useState<LightingSettings>(INITIAL_LIGHT);
   const lightingRef = useRef(lighting);
   const [htmlCanvasReady, setHtmlCanvasReady] = useState(false);
@@ -126,7 +126,7 @@ export function MorsLightCanvas() {
       console.error(rendererError);
       const errorTimer = window.setTimeout(() => {
         if (!disposed) {
-          setError("This experience needs WebGL to render the HZC light study.");
+          setError("This experience needs WebGL to render the HZC detective playroom.");
         }
       }, 0);
       return () => {
@@ -159,8 +159,8 @@ export function MorsLightCanvas() {
     const pageGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
     const pageMaterial = new THREE.MeshStandardMaterial({
       map: pageTexture,
-      color: 0xc5cad4,
-      roughness: 0.96,
+      color: 0xffffff,
+      roughness: 0.9,
       metalness: 0,
       transparent: true,
       alphaTest: 0.005,
@@ -178,10 +178,10 @@ export function MorsLightCanvas() {
     backing.position.z = -0.035;
     pageGroup.add(backing);
 
-    const ambient = new THREE.HemisphereLight(0x71809b, 0x151118, 0.58);
+    const ambient = new THREE.HemisphereLight(0x9db6d9, 0x2a1b16, 1.08);
     scene.add(ambient);
 
-    const fillLight = new THREE.DirectionalLight(0x91a6c8, 0.24);
+    const fillLight = new THREE.DirectionalLight(0xaec7ef, 0.42);
     fillLight.position.set(-4.8, 5.6, 7.4);
     scene.add(fillLight);
 
@@ -680,10 +680,10 @@ export function MorsLightCanvas() {
   return (
     <main
       className={`experience-shell${ready ? " is-ready" : ""}`}
-      aria-label="Interactive HZC light study"
+      aria-label="Interactive HZC detective light playroom"
       aria-busy={!ready && !error}
     >
-      <canvas ref={canvasRef} className="webgl-canvas" aria-label="Interactive HZC light study">
+      <canvas ref={canvasRef} className="webgl-canvas" aria-label="Interactive HZC detective light playroom">
         <MorsPageSurface
           sourceRef={pageSourceRef}
           concept={concept}

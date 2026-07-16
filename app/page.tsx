@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { MorsLightExperience } from "./MorsLightExperience";
 
 export const metadata: Metadata = {
-  title: "HZC — 我是鼠鼠大王",
-  description:
-    "A small, elegant, high-performance Rust game engine architecture built around Space, Meta, Field, Rule, and Latent.",
+  title: "菠萝包 & さと",
+  description: "菠萝包和さと的侦探搭档灯光互动页面。",
 };
 
 export default function Home() {
