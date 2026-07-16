@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
+import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
+
+const notoSansJP = Noto_Sans_JP({
+  weight: "variable",
+  display: "swap",
+  variable: "--font-noto-sans-jp",
+  preload: false,
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hanzichuan5-ctrl.github.io/HTML-Light-Demo/";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -35,7 +43,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={notoSansJP.variable}>{children}</body>
     </html>
   );
 }

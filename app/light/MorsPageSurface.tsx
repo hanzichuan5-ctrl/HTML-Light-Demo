@@ -57,8 +57,8 @@ export function MorsPageSurface({
             我是<br />
             <span>鼠鼠大王</span>
           </h1>
-          <p className="page-subtitle">
-            A Rust engine architecture where rules derive tightly packed data layout for elegant performance.
+          <p className="page-subtitle" lang="ja">
+            ルールが緻密なデータレイアウトを導出し、洗練されたパフォーマンスを実現するRustエンジンアーキテクチャ。
           </p>
 
           <div className="concepts" data-interactive>

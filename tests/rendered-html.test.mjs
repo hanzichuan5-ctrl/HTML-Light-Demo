@@ -32,7 +32,7 @@ test("server-renders the HZC light experience shell", async () => {
   assert.match(html, /<title>HZC — 我是鼠鼠大王 — HZC<\/title>/i);
   assert.match(html, /Interactive HZC light study/);
   assert.match(html, /我是鼠鼠大王/);
-  assert.match(html, /A Rust engine architecture/);
+  assert.match(html, /ルールが緻密なデータレイアウトを導出/);
   assert.match(html, /EARLY DEVELOPMENT/);
 });
 
@@ -79,6 +79,7 @@ test("keeps the light, controls, and simulation in the shipped source", async ()
   assert.match(surface, /function MorsLightPreview/);
   assert.match(page, /<MorsLightExperience \/>/);
   assert.match(layout, /HZC/);
+  assert.match(layout, /Noto_Sans_JP/);
   assert.match(layout, /og\.jpg/);
   assert.match(packageJson, /"three-html-render"/);
   assert.doesNotMatch(packageJson, /tailwindcss/);

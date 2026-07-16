@@ -239,10 +239,11 @@ button {
   background: linear-gradient(90deg, #ffb457 0%, #ff6f65 44%, #d27fff 100%);
   background-clip: text;
   -webkit-background-clip: text;
+  font-family: var(--font-noto-sans-jp), "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
   font-size: 21px;
   font-weight: 520;
-  letter-spacing: -0.027em;
-  line-height: 1.35;
+  letter-spacing: -0.012em;
+  line-height: 1.5;
 }
 
 .concepts {
