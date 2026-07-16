@@ -8,25 +8,25 @@ const publicAsset = (path: string) => new URL(`${basePath}${path}`, siteUrl).toS
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MORS² Game Engine",
-    template: "%s — MORS²",
+    default: "HZC Game Engine",
+    template: "%s — HZC",
   },
   description:
-    "MORS² is a small, elegant, high-performance Rust game engine architecture.",
+    "HZC is a small, elegant, high-performance Rust game engine architecture.",
   icons: {
     icon: publicAsset("/mors-logo.svg"),
     shortcut: publicAsset("/mors-logo.svg"),
   },
   openGraph: {
-    title: "MORS² Game Engine",
+    title: "HZC Game Engine",
     description: "Meta is observed by Rule to Step in Space.",
     type: "website",
     url: siteUrl,
-    images: [{ url: publicAsset("/og.jpg"), width: 1200, height: 630, alt: "A hanging light reveals the MORS² engine architecture." }],
+    images: [{ url: publicAsset("/og.jpg"), width: 1200, height: 630, alt: "A hanging light reveals the HZC engine architecture." }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MORS² Game Engine",
+    title: "HZC Game Engine",
     description: "Meta is observed by Rule to Step in Space.",
     images: [publicAsset("/og.jpg")],
   },

@@ -126,7 +126,7 @@ export function MorsLightCanvas() {
       console.error(rendererError);
       const errorTimer = window.setTimeout(() => {
         if (!disposed) {
-          setError("This experience needs WebGL to render the MORS² light study.");
+          setError("This experience needs WebGL to render the HZC light study.");
         }
       }, 0);
       return () => {
@@ -680,10 +680,10 @@ export function MorsLightCanvas() {
   return (
     <main
       className={`experience-shell${ready ? " is-ready" : ""}`}
-      aria-label="Interactive MORS² light study"
+      aria-label="Interactive HZC light study"
       aria-busy={!ready && !error}
     >
-      <canvas ref={canvasRef} className="webgl-canvas" aria-label="Interactive MORS² light study">
+      <canvas ref={canvasRef} className="webgl-canvas" aria-label="Interactive HZC light study">
         <MorsPageSurface
           sourceRef={pageSourceRef}
           concept={concept}

@@ -23,14 +23,14 @@ async function render() {
   );
 }
 
-test("server-renders the MORS² light experience shell", async () => {
+test("server-renders the HZC light experience shell", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>MORS² — Meta is observed by Rule to Step in Space — MORS²<\/title>/i);
-  assert.match(html, /Interactive MORS² light study/);
+  assert.match(html, /<title>HZC — Meta is observed by Rule to Step in Space — HZC<\/title>/i);
+  assert.match(html, /Interactive HZC light study/);
   assert.match(html, /Meta is observed/);
   assert.match(html, /A Rust engine architecture/);
   assert.match(html, /EARLY DEVELOPMENT/);
@@ -78,7 +78,7 @@ test("keeps the light, controls, and simulation in the shipped source", async ()
   assert.match(surface, />COLOR</);
   assert.match(surface, /function MorsLightPreview/);
   assert.match(page, /<MorsLightExperience \/>/);
-  assert.match(layout, /MORS²/);
+  assert.match(layout, /HZC/);
   assert.match(layout, /og\.jpg/);
   assert.match(packageJson, /"three-html-render"/);
   assert.doesNotMatch(packageJson, /tailwindcss/);

@@ -44,7 +44,7 @@ export function MorsPageSurface({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`${BASE_PATH}/mors-logo.svg`} alt="" />
           </span>
-          <span>MORS²</span>
+          <span>HZC</span>
           <span className="page-brand-suffix">GAME ENGINE</span>
         </div>
         <div className="page-status"><span /> EARLY DEVELOPMENT</div>
@@ -62,7 +62,7 @@ export function MorsPageSurface({
           </p>
 
           <div className="concepts" data-interactive>
-            <div className="concept-list" role="list" aria-label="MORS² engine model">
+            <div className="concept-list" role="list" aria-label="HZC engine model">
               {(Object.keys(CONCEPTS) as Concept[]).map((item, index) => (
                 <button
                   key={item}
@@ -192,7 +192,7 @@ export function MorsLightPreview({ hidden = false }: { hidden?: boolean }) {
 
 export function MorsLightLoading() {
   return (
-    <main className="experience-shell" aria-label="Interactive MORS² light study">
+    <main className="experience-shell" aria-label="Interactive HZC light study">
       <MorsLightPreview />
       <div className="scene-status" aria-live="polite">
         <span /> LOADING INTERACTIVE LIGHT
