@@ -37,11 +37,12 @@ test("server-renders the HZC light experience shell", async () => {
 });
 
 test("keeps the light, controls, and simulation in the shipped source", async () => {
-  const [experience, canvas, surface, compatibility, page, layout, packageJson, worker] = await Promise.all([
+  const [experience, canvas, surface, compatibility, config, page, layout, packageJson, worker] = await Promise.all([
     readFile(new URL("../app/MorsLightExperience.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/light/MorsLightCanvas.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/light/MorsPageSurface.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/light/three-html-compatibility.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/light/config.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
@@ -76,6 +77,7 @@ test("keeps the light, controls, and simulation in the shipped source", async ()
   assert.match(surface, />BEAM</);
   assert.match(surface, /BRIGHTNESS/);
   assert.match(surface, />COLOR</);
+  assert.match(config, /"#ffffff"/);
   assert.match(surface, /function MorsLightPreview/);
   assert.match(page, /<MorsLightExperience \/>/);
   assert.match(layout, /HZC/);
