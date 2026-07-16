@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "HZC Game Engine",
-    description: "Meta is observed by Rule to Step in Space.",
+    description: "我是鼠鼠大王",
     type: "website",
     url: siteUrl,
     images: [{ url: publicAsset("/og.jpg"), width: 1200, height: 630, alt: "A hanging light reveals the HZC engine architecture." }],
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "HZC Game Engine",
-    description: "Meta is observed by Rule to Step in Space.",
+    description: "我是鼠鼠大王",
     images: [publicAsset("/og.jpg")],
   },
 };

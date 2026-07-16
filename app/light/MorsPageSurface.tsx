@@ -54,8 +54,8 @@ export function MorsPageSurface({
         <section className="page-copy" aria-labelledby={titleId}>
           <p className="page-kicker">01 / RUNTIME ARCHITECTURE</p>
           <h1 id={titleId}>
-            Meta is observed<br />
-            by Rule to <span>Step in Space.</span>
+            我是<br />
+            <span>鼠鼠大王</span>
           </h1>
           <p className="page-subtitle">
             A Rust engine architecture where rules derive tightly packed data layout for elegant performance.

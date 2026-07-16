@@ -29,9 +29,9 @@ test("server-renders the HZC light experience shell", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>HZC — Meta is observed by Rule to Step in Space — HZC<\/title>/i);
+  assert.match(html, /<title>HZC — 我是鼠鼠大王 — HZC<\/title>/i);
   assert.match(html, /Interactive HZC light study/);
-  assert.match(html, /Meta is observed/);
+  assert.match(html, /我是鼠鼠大王/);
   assert.match(html, /A Rust engine architecture/);
   assert.match(html, /EARLY DEVELOPMENT/);
 });
