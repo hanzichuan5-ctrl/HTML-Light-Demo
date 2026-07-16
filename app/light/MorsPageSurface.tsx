@@ -58,7 +58,7 @@ export function MorsPageSurface({
             <span>鼠鼠大王</span>
           </h1>
           <p className="page-subtitle" lang="ja">
-            ルールが緻密なデータレイアウトを導出し、洗練されたパフォーマンスを実現するRustエンジンアーキテクチャ。
+            はじめましてよろしくお願いします
           </p>
 
           <div className="concepts" data-interactive>

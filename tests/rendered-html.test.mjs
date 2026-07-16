@@ -32,7 +32,7 @@ test("server-renders the HZC light experience shell", async () => {
   assert.match(html, /<title>HZC — 我是鼠鼠大王 — HZC<\/title>/i);
   assert.match(html, /Interactive HZC light study/);
   assert.match(html, /我是鼠鼠大王/);
-  assert.match(html, /ルールが緻密なデータレイアウトを導出/);
+  assert.match(html, /はじめましてよろしくお願いします/);
   assert.match(html, /EARLY DEVELOPMENT/);
 });
 
