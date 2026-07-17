@@ -29,12 +29,12 @@ test("server-renders the HZC light experience shell", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>菠萝包 &amp; さと — HZC<\/title>/i);
+  assert.match(html, /<title>??? &amp; ?? ? HZC<\/title>/i);
   assert.match(html, /Interactive HZC detective light playroom/);
-  assert.match(html, /菠萝包/);
-  assert.match(html, /さと/);
-  assert.match(html, /侦探搭档/);
-  assert.match(html, /はじめましてよろしくお願いします/);
+  assert.match(html, /???/);
+  assert.match(html, /??/);
+  assert.match(html, /????/);
+  assert.match(html, /????????????????/);
   assert.match(html, /CASE LIVE/);
 });
 
@@ -77,19 +77,22 @@ test("keeps the light, controls, and simulation in the shipped source", async ()
   assert.doesNotMatch(canvas, /event\.preventDefault\(\)/);
   assert.match(canvas, /width < 760 \? 1\.25 : 1\.5/);
   assert.match(surface, /LIGHT_MODES/);
-  assert.match(surface, /FOUND CLUE/);
+  assert.match(surface, /INSPECTING/);
   assert.match(surface, /SEARCHING/);
   assert.match(surface, /CLUE_DETECTION_RADIUS/);
   assert.doesNotMatch(surface, /clue-marker/);
   assert.doesNotMatch(surface, /inspector-light/);
-  assert.match(surface, /20260716-231908\.jpg/);
-  assert.match(surface, /菠萝包/);
-  assert.match(surface, /さと/);
+  assert.match(surface, /gallery-case-portrait\.png/);
+  assert.match(surface, /CLUE_HOLD_MS/);
+  assert.match(surface, /Math\.random\(\)/);
+  assert.match(surface, /FINAL DEDUCTION/);
+  assert.match(surface, /???/);
+  assert.match(surface, /??/);
   assert.match(surface, />BEAM</);
   assert.match(surface, /BRIGHTNESS/);
   assert.match(surface, />COLOR</);
   assert.match(config, /"#ffffff"/);
-  assert.match(config, /案件/);
+  assert.match(config, /??/);
   assert.match(surface, /function MorsLightPreview/);
   assert.match(page, /<MorsLightExperience \/>/);
   assert.match(layout, /HZC/);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type CSSProperties, type PointerEvent, type Ref } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type PointerEvent, type Ref } from "react";
 import {
   COLOR_PRESETS,
   CONCEPTS,
@@ -10,67 +10,93 @@ import {
 } from "./config";
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const COMPACT_VIEWPORT = "(max-width: 700px)";
 
-const CLUES = [
+function subscribeToCompactViewport(callback: () => void) {
+  const media = window.matchMedia(COMPACT_VIEWPORT);
+  media.addEventListener("change", callback);
+  return () => media.removeEventListener("change", callback);
+}
+
+function getCompactViewportSnapshot() {
+  return window.matchMedia(COMPACT_VIEWPORT).matches;
+}
+
+const CLUE_DETECTION_RADIUS = 13;
+const CLUE_HOLD_MS = 1000;
+
+const CASE_CLUES = [
   {
-    id: "boluobao",
-    name: "菠萝包",
-    role: "行动担当",
-    detail: "很勇敢，先冲再说。偶尔会把线索当零食看。",
-    x: 42,
-    y: 54,
+    id: "varnish",
+    name: "????????",
+    role: "??????",
+    detail: "??????????????????????????????????",
+    positions: [{ x: 46, y: 42 }, { x: 61, y: 37 }, { x: 37, y: 54 }],
   },
   {
-    id: "sato",
-    name: "さと",
-    role: "智商担当",
-    detail: "聪明并且帅气，真正负责把案件拼起来。",
-    x: 78,
-    y: 67,
+    id: "tape",
+    name: "?????????",
+    role: "???????",
+    detail: "???????????????????????????????",
+    positions: [{ x: 15, y: 22 }, { x: 83, y: 30 }, { x: 24, y: 79 }],
   },
   {
-    id: "hat",
-    name: "侦探帽",
-    role: "气氛担当",
-    detail: "戴上之后，菠萝包会觉得自己已经接近真相。",
-    x: 47,
-    y: 17,
+    id: "calibration",
+    name: "??????????",
+    role: "??????",
+    detail: "??????????????????????????????????",
+    positions: [{ x: 73, y: 72 }, { x: 29, y: 69 }, { x: 78, y: 51 }],
   },
   {
-    id: "glasses",
-    name: "眼镜",
-    role: "帅气证据",
-    detail: "さと的推理加成。也是现场最闪的线索之一。",
-    x: 80,
-    y: 59,
+    id: "imprint",
+    name: "???????",
+    role: "?????",
+    detail: "?????????????????????????",
+    positions: [{ x: 50, y: 86 }, { x: 35, y: 82 }, { x: 68, y: 84 }],
   },
 ] as const;
 
-const CLUE_DETECTION_RADIUS = 13;
+const SUSPECTS = [
+  { id: "curator", name: "???", role: "????" },
+  { id: "restorer", name: "???", role: "????" },
+  { id: "lighting", name: "?????", role: "????" },
+] as const;
+
+type CaseClue = Omit<(typeof CASE_CLUES)[number], "positions"> & {
+  x: number;
+  y: number;
+};
+
+function createCaseClues(): CaseClue[] {
+  return CASE_CLUES.map(({ positions, ...clue }) => {
+    const position = positions[Math.floor(Math.random() * positions.length)];
+    return { ...clue, ...position };
+  });
+}
 
 const LIGHT_MODES = [
   {
     id: "warm",
-    label: "暖光",
-    description: "角色介绍",
+    label: "??",
+    description: "????",
     settings: { enabled: true, color: "#ffb36b", brightness: 1450, angle: 34 },
   },
   {
     id: "white",
-    label: "白光",
-    description: "手电筒",
+    label: "??",
+    description: "???",
     settings: { enabled: true, color: "#ffffff", brightness: 1800, angle: 26 },
   },
   {
     id: "case",
-    label: "探案",
-    description: "找线索",
+    label: "??",
+    description: "???",
     settings: { enabled: true, color: "#8fdcff", brightness: 1250, angle: 22 },
   },
   {
     id: "play",
-    label: "玩闹",
-    description: "随便玩",
+    label: "??",
+    description: "???",
     settings: { enabled: true, color: "#ff5f7f", brightness: 2100, angle: 48 },
   },
 ] as const;
@@ -96,26 +122,71 @@ export function MorsPageSurface({
 }: MorsPageSurfaceProps) {
   const titleId = preview ? "mors-title-preview" : "mors-title";
   const tabIndex = preview ? -1 : undefined;
+  const isCompact = useSyncExternalStore(subscribeToCompactViewport, getCompactViewportSnapshot, () => false);
   const stageRef = useRef<HTMLDivElement>(null);
-  const [activeClue, setActiveClue] = useState<(typeof CLUES)[number] | null>(null);
+  const [caseClues, setCaseClues] = useState<CaseClue[]>(createCaseClues);
+  const [foundClueIds, setFoundClueIds] = useState<string[]>([]);
+  const [candidateClueId, setCandidateClueId] = useState<string | null>(null);
+  const [lastFoundClueId, setLastFoundClueId] = useState<string | null>(null);
+  const [casePhase, setCasePhase] = useState<"searching" | "deducing" | "solved">("searching");
+  const [caseNotice, setCaseNotice] = useState<"wrong" | null>(null);
+  const candidateClue = caseClues.find((clue) => clue.id === candidateClueId) ?? null;
+  const activeClue = caseClues.find((clue) => clue.id === lastFoundClueId) ?? null;
+  const foundClues = caseClues.filter((clue) => foundClueIds.includes(clue.id));
+  const isChecking = Boolean(candidateClue && !foundClueIds.includes(candidateClue.id));
+
+  useEffect(() => {
+    if (!candidateClue || !isChecking || casePhase !== "searching") return;
+
+    const timer = window.setTimeout(() => {
+      setFoundClueIds((current) => current.includes(candidateClue.id) ? current : [...current, candidateClue.id]);
+      setLastFoundClueId(candidateClue.id);
+      setCandidateClueId(null);
+      if (foundClueIds.length + 1 === caseClues.length) setCasePhase("deducing");
+    }, CLUE_HOLD_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [candidateClue, caseClues.length, casePhase, foundClueIds.length, isChecking]);
+
+  function resetCase(wrongAnswer = false) {
+    setCaseClues(createCaseClues());
+    setFoundClueIds([]);
+    setCandidateClueId(null);
+    setLastFoundClueId(null);
+    setCasePhase("searching");
+    setCaseNotice(wrongAnswer ? "wrong" : null);
+  }
+
+  function chooseSuspect(suspectId: (typeof SUSPECTS)[number]["id"]) {
+    if (suspectId === "lighting") {
+      setCasePhase("solved");
+      return;
+    }
+    resetCase(true);
+  }
 
   function moveInspector(event: PointerEvent<HTMLDivElement>) {
+    if (!lighting.enabled || casePhase !== "searching") {
+      setCandidateClueId(null);
+      return;
+    }
     const rect = stageRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
-    const nearest = CLUES.map((clue) => ({
+    const nearest = caseClues.map((clue) => ({
       clue,
       distance: Math.hypot(clue.x - x, clue.y - y),
     })).sort((a, b) => a.distance - b.distance)[0];
 
-    setActiveClue(nearest.distance <= CLUE_DETECTION_RADIUS ? nearest.clue : null);
+    setCaseNotice(null);
+    setCandidateClueId(nearest.distance <= CLUE_DETECTION_RADIUS ? nearest.clue.id : null);
   }
 
   return (
     <div
       ref={sourceRef}
-      className="page-source"
+      className={`page-source${isCompact ? " is-compact" : ""}`}
       style={
         {
           "--lamp-color": lighting.color,
@@ -137,14 +208,14 @@ export function MorsPageSurface({
 
       <div className="page-main">
         <section className="page-copy" aria-labelledby={titleId}>
-          <p className="page-kicker">菠萝包 × さと / 侦探搭档</p>
+          <p className="page-kicker">??? ? ?? / ????</p>
           <h1 id={titleId}>
-            菠萝包<br />
-            <span>&amp; さと</span>
+            ???<br />
+            <span>&amp; ??</span>
           </h1>
-          <p className="mouse-king">我是鼠鼠大王</p>
+          <p className="mouse-king">??????</p>
           <p className="page-subtitle" lang="ja">
-            はじめましてよろしくお願いします
+            ????????????????
           </p>
 
           <div className="case-summary" data-interactive>
@@ -173,18 +244,50 @@ export function MorsPageSurface({
             data-interactive
             onPointerMove={moveInspector}
             onPointerEnter={moveInspector}
-            onPointerLeave={() => setActiveClue(null)}
+            onPointerLeave={() => setCandidateClueId(null)}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${BASE_PATH}/20260716-231908.jpg`} alt="菠萝包和さと侦探搭档" />
+            <img src={`${BASE_PATH}/gallery-case-portrait.png`} alt="???????" />
           </div>
 
-          <aside className={`clue-card${activeClue ? "" : " is-empty"}`} data-interactive aria-live="polite">
-            <p>{activeClue ? "FOUND CLUE" : "SEARCHING"}</p>
-            <h2>{activeClue?.name ?? "移动灯光寻找线索"}</h2>
-            <strong>{activeClue?.role ?? "隐藏感应中"}</strong>
-            <span>{activeClue?.detail ?? "把灯光移到菠萝包、さと、帽子或眼镜附近，线索说明会自动出现。"}</span>
+          <aside className={`clue-card case-clue-card${activeClue || isChecking ? "" : " is-empty"}`} data-interactive aria-live="polite">
+            <div className="case-card-header">
+              <p>{casePhase === "solved" ? "CASE SOLVED" : casePhase === "deducing" ? "READY TO DEDUCE" : isChecking ? "INSPECTING" : caseNotice === "wrong" ? "CASE RESET" : "SEARCHING"}</p>
+              <span>{foundClues.length} / {caseClues.length}</span>
+            </div>
+            <h2>{casePhase === "solved" ? "??????" : casePhase === "deducing" ? "?????????" : isChecking ? "??????????" : activeClue?.name ?? "????????????"}</h2>
+            <strong>{casePhase === "solved" ? "????????" : casePhase === "deducing" ? "???????????" : isChecking ? "??? 1 ?" : activeClue?.role ?? (caseNotice === "wrong" ? "???????" : lighting.enabled ? "??????" : "??????")}</strong>
+            <span>{casePhase === "solved" ? "?????????????????????????" : casePhase === "deducing" ? "??????????????????????????" : isChecking ? "????????????" : activeClue?.detail ?? (caseNotice === "wrong" ? "?????????????????????" : "?????????????????")}</span>
           </aside>
+
+          {casePhase === "deducing" || casePhase === "solved" ? (
+            <section className={`deduction-card${casePhase === "solved" ? " is-solved" : ""}`} data-interactive aria-label="Point out the culprit">
+              {casePhase === "deducing" ? (
+                <>
+                  <p>FINAL DEDUCTION / ?????</p>
+                  <div className="suspect-options">
+                    {SUSPECTS.map((suspect) => (
+                      <button key={suspect.id} type="button" onClick={() => chooseSuspect(suspect.id)} tabIndex={tabIndex}>
+                        <b>{suspect.name}</b><span>{suspect.role}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p>CASE 01 CLOSED</p>
+                  <button type="button" className="replay-case" onClick={() => resetCase()} tabIndex={tabIndex}>???? <span>?</span></button>
+                </>
+              )}
+            </section>
+          ) : (
+            <div className="evidence-board" aria-label="Evidence board">
+              {caseClues.map((clue, index) => {
+                const found = foundClueIds.includes(clue.id);
+                return <div key={clue.id} className={found ? "is-found" : ""}><b>0{index + 1}</b><span>{found ? clue.name : "??????"}</span></div>;
+              })}
+            </div>
+          )}
         </section>
 
         <aside className="light-controls" data-interactive aria-label="Spotlight controls">
@@ -221,7 +324,7 @@ export function MorsPageSurface({
           </div>
 
           <label className="control-row">
-            <span className="control-label"><b>BEAM</b><output>{lighting.angle}°</output></span>
+            <span className="control-label"><b>BEAM</b><output>{lighting.angle}?</output></span>
             <input
               type="range"
               min="16"
@@ -276,18 +379,18 @@ export function MorsPageSurface({
           </div>
 
           <button type="button" className="reset-light" onClick={onReset} tabIndex={tabIndex}>
-            RESET LIGHT <span>↗</span>
+            RESET LIGHT <span>?</span>
           </button>
         </aside>
       </div>
 
       <footer className="page-footer">
-        <p>菠萝包 / さと / CASE FILE / FUN LIGHT</p>
+        <p>??? / ?? / CASE FILE / FUN LIGHT</p>
         <div className="drag-instruction">
           <span className="drag-orbit" aria-hidden="true"><i /></span>
-          <div><b>LMB PULL · RMB LIGHT</b><span>Light the photo · Reveal clues</span></div>
+          <div><b>LMB PULL ? RMB LIGHT</b><span>Light the photo ? Reveal clues</span></div>
         </div>
-        <p>BRAVE BODYGUARD — GENIUS PARTNER</p>
+        <p>BRAVE BODYGUARD ? GENIUS PARTNER</p>
       </footer>
     </div>
   );
@@ -301,7 +404,7 @@ export function MorsLightPreview({ hidden = false }: { hidden?: boolean }) {
   return (
     <div className={`scene-preview${hidden ? " is-hidden" : ""}`} aria-hidden="true" inert>
       <MorsPageSurface
-        concept="案件"
+        concept="??"
         lighting={INITIAL_LIGHT}
         onConceptChange={ignoreConceptChange}
         onLightingChange={ignoreLightingChange}
