@@ -39,10 +39,13 @@ test("server-renders the HZC light experience shell", async () => {
 });
 
 test("keeps the light, controls, and simulation in the shipped source", async () => {
-  const [experience, canvas, surface, compatibility, config, page, layout, packageJson, worker] = await Promise.all([
+  const [experience, canvas, surface, detectiveExperience, detectiveEggs, detectiveStorage, compatibility, config, page, layout, packageJson, worker] = await Promise.all([
     readFile(new URL("../app/MorsLightExperience.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/light/MorsLightCanvas.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/light/MorsPageSurface.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/light/DetectiveExperience.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/light/detective-eggs.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/light/detective-storage.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/light/three-html-compatibility.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/light/config.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
@@ -67,8 +70,7 @@ test("keeps the light, controls, and simulation in the shipped source", async ()
   assert.match(canvas, /shouldCycleColor/);
   assert.match(canvas, /contextmenu/);
   assert.match(canvas, /const BASE_LIGHT_DIRECTION = DOWN\.clone\(\)/);
-  assert.match(canvas, /const cameraDrop = portrait/);
-  assert.match(canvas, /const upwardTarget = portrait/);
+  assert.match(canvas, /const sceneCenterY/);
   assert.match(canvas, /const fixedStep = 1 \/ 120/);
   assert.match(canvas, /function updatePointerTarget/);
   assert.match(canvas, /pullStrength/);
@@ -91,6 +93,12 @@ test("keeps the light, controls, and simulation in the shipped source", async ()
   assert.match(config, /"#ffffff"/);
   assert.match(config, /案件/);
   assert.match(surface, /function MorsLightPreview/);
+  assert.match(detectiveExperience, /fingerprint-unlock/);
+  assert.match(detectiveExperience, /侦探手册/);
+  assert.match(detectiveEggs, /createRoundEggs/);
+  assert.match(detectiveEggs, /PHRASE_EGGS/);
+  assert.match(detectiveEggs, /ENVIRONMENT_EGGS/);
+  assert.match(detectiveStorage, /indexedDB\.open/);
   assert.match(page, /<MorsLightExperience \/>/);
   assert.match(layout, /HZC/);
   assert.match(layout, /Noto_Sans_JP/);

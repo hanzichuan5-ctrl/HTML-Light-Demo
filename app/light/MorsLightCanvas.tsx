@@ -10,6 +10,15 @@ import {
   type LightingSettings,
 } from "./config";
 import { MorsLightPreview, MorsPageSurface } from "./MorsPageSurface";
+import { DetectiveNotebook, NotebookReplay, RoundCompleteDialog } from "./DetectiveExperience";
+import { createRoundEggs, type DetectiveEgg, type RoundEgg } from "./detective-eggs";
+import { playDiscoverySound, playRoundCompleteSound } from "./detective-audio";
+import {
+  EMPTY_PROGRESS,
+  loadDetectiveProgress,
+  saveDetectiveProgress,
+  type DetectiveProgress,
+} from "./detective-storage";
 import {
   installThreeHtmlTextureCompatibility,
   type HtmlCanvas,
@@ -21,6 +30,15 @@ type LightRig = {
   bulbMaterial: THREE.MeshStandardMaterial;
   glowMaterial: THREE.SpriteMaterial;
   undersideMaterial: THREE.MeshStandardMaterial;
+  ambient: THREE.HemisphereLight;
+  fillLight: THREE.DirectionalLight;
+};
+
+type LightSample = {
+  active: boolean;
+  x: number;
+  y: number;
+  radius: number;
 };
 
 const DOWN = new THREE.Vector3(0, -1, 0);
@@ -34,12 +52,81 @@ export function MorsLightCanvas() {
   const activeColorRef = useRef(new THREE.Color());
   const wakeRef = useRef<(() => void) | null>(null);
   const resetMotionRef = useRef<(() => void) | null>(null);
+  const lightSampleRef = useRef<LightSample>({ active: false, x: 50, y: 50, radius: 11 });
+  const roundEggsRef = useRef<RoundEgg[]>([]);
+  const progressRef = useRef<DetectiveProgress>(EMPTY_PROGRESS);
   const [concept, setConcept] = useState<Concept>("案件");
   const [lighting, setLighting] = useState<LightingSettings>(INITIAL_LIGHT);
   const lightingRef = useRef(lighting);
   const [htmlCanvasReady, setHtmlCanvasReady] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
+  const [roundEggs, setRoundEggs] = useState<RoundEgg[]>([]);
+  const [progress, setProgress] = useState<DetectiveProgress>(EMPTY_PROGRESS);
+  const [storageReady, setStorageReady] = useState(false);
+  const [notebookOpen, setNotebookOpen] = useState(false);
+  const [replayEgg, setReplayEgg] = useState<DetectiveEgg | null>(null);
+  const [roundComplete, setRoundComplete] = useState<"celebrating" | "ready" | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void loadDetectiveProgress()
+      .catch(() => EMPTY_PROGRESS)
+      .then((stored) => {
+        if (!active) return;
+        progressRef.current = stored;
+        setProgress(stored);
+        setRoundEggs(createRoundEggs(stored.collected.map((item) => item.id)));
+        setStorageReady(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    roundEggsRef.current = roundEggs;
+  }, [roundEggs]);
+
+  useEffect(() => {
+    progressRef.current = progress;
+    if (!storageReady) return;
+    const saveTimer = window.setTimeout(() => {
+      void saveDetectiveProgress(progress).catch((storageError) => {
+        console.warn("Detective notebook could not be saved.", storageError);
+      });
+    }, 120);
+    return () => window.clearTimeout(saveTimer);
+  }, [progress, storageReady]);
+
+  useEffect(() => {
+    const chargeTimer = window.setInterval(() => {
+      const sample = lightSampleRef.current;
+      setRoundEggs((current) => {
+        let changed = false;
+        const next = current.map((egg) => {
+          const distanceX = egg.x - sample.x;
+          const distanceY = (egg.y - sample.y) * 0.56;
+          const lit = sample.active && Math.hypot(distanceX, distanceY) <= sample.radius;
+          const charge = egg.unlocked
+            ? egg.charge
+            : lit
+              ? Math.min(1, egg.charge + 1 / 30)
+              : Math.max(0, egg.charge - 0.1);
+          const reveal = egg.unlocked
+            ? lit
+              ? Math.min(1, egg.reveal + 0.16)
+              : Math.max(0, egg.reveal - 0.05)
+            : 0;
+          if (charge === egg.charge && reveal === egg.reveal) return egg;
+          changed = true;
+          return { ...egg, charge, reveal };
+        });
+        return changed ? next : current;
+      });
+    }, 50);
+    return () => window.clearInterval(chargeTimer);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -86,6 +173,9 @@ export function MorsLightCanvas() {
     let beamStartY = 0;
     let beamStartAngle = INITIAL_LIGHT.angle;
     let beamDragged = false;
+    let hasAimed = false;
+    let currentPageWidth = 12.8;
+    let currentPageHeight = 7.2;
 
     const fixedStep = 1 / 120;
     const ropeLength = 1.22;
@@ -178,10 +268,10 @@ export function MorsLightCanvas() {
     backing.position.z = -0.035;
     pageGroup.add(backing);
 
-    const ambient = new THREE.HemisphereLight(0x9db6d9, 0x2a1b16, 1.08);
+    const ambient = new THREE.HemisphereLight(0x9db6d9, 0x2a1b16, 0.055);
     scene.add(ambient);
 
-    const fillLight = new THREE.DirectionalLight(0xaec7ef, 0.42);
+    const fillLight = new THREE.DirectionalLight(0xaec7ef, 0.025);
     fillLight.position.set(-4.8, 5.6, 7.4);
     scene.add(fillLight);
 
@@ -291,7 +381,7 @@ export function MorsLightCanvas() {
     bulbLight.position.set(0, -0.35, 0);
     shadeGroup.add(bulbLight);
 
-    lightRigRef.current = { spot, bulbLight, bulbMaterial, glowMaterial, undersideMaterial };
+    lightRigRef.current = { spot, bulbLight, bulbMaterial, glowMaterial, undersideMaterial, ambient, fillLight };
 
     const interactions = new InteractionManager();
     interactions.connect(renderer, camera);
@@ -330,6 +420,8 @@ export function MorsLightCanvas() {
       const portrait = height > width * 1.16;
       const pageWidth = portrait ? 7.2 : 12.8;
       const pageHeight = pageWidth * (sourceHeight / sourceWidth);
+      currentPageWidth = pageWidth;
+      currentPageHeight = pageHeight;
       pageMesh.scale.set(pageWidth, pageHeight, 1);
       backing.scale.set(pageWidth, pageHeight, 1);
 
@@ -385,6 +477,19 @@ export function MorsLightCanvas() {
       lampQuaternion.setFromUnitVectors(DOWN, currentLightDirection);
       lampRoot.position.copy(position);
       lampRoot.quaternion.copy(lampQuaternion);
+
+      const sampleX = THREE.MathUtils.clamp((aimTarget.x / currentPageWidth + 0.5) * 100, 0, 100);
+      const sampleY = THREE.MathUtils.clamp(
+        (0.5 - (aimTarget.y - pageGroup.position.y) / currentPageHeight) * 100,
+        0,
+        100,
+      );
+      lightSampleRef.current = {
+        active: lightingRef.current.enabled && hasAimed,
+        x: sampleX,
+        y: sampleY,
+        radius: 6.5 + lightingRef.current.angle * 0.13,
+      };
 
     }
 
@@ -483,6 +588,7 @@ export function MorsLightCanvas() {
       if (event.button !== 0 || beamPointerId !== -1) return;
       if (!updatePointerTarget(event)) return;
 
+      hasAimed = true;
       pulling = true;
       pullPointerId = event.pointerId;
       lastPointerTime = performance.now();
@@ -672,6 +778,74 @@ export function MorsLightCanvas() {
     wakeRef.current?.();
   }, [lighting]);
 
+  const roundFound = roundEggs.filter((egg) => egg.unlocked).length;
+
+  useEffect(() => {
+    if (roundFound !== 6 || roundComplete) return;
+    const startTimer = window.setTimeout(() => {
+      setRoundComplete("celebrating");
+      setProgress((current) => ({ ...current, completedRounds: current.completedRounds + 1 }));
+      if (progressRef.current.soundEnabled) playRoundCompleteSound();
+    }, 0);
+    return () => window.clearTimeout(startTimer);
+  }, [roundComplete, roundFound]);
+
+  useEffect(() => {
+    if (roundComplete !== "celebrating") return;
+    const celebrationTimer = window.setTimeout(() => setRoundComplete("ready"), 3000);
+    return () => window.clearTimeout(celebrationTimer);
+  }, [roundComplete]);
+
+  useEffect(() => {
+    const rig = lightRigRef.current;
+    if (!rig) return;
+    const celebrating = roundComplete === "celebrating";
+    rig.ambient.intensity = celebrating ? 1.42 : 0.055;
+    rig.fillLight.intensity = celebrating ? 0.72 : 0.025;
+    wakeRef.current?.();
+  }, [ready, roundComplete]);
+
+  function unlockEgg(id: string) {
+    const target = roundEggsRef.current.find((egg) => egg.id === id);
+    if (!target || target.unlocked || target.charge < 0.995) return;
+
+    setRoundEggs((current) => current.map((egg) => (
+      egg.id === id ? { ...egg, unlocked: true, reveal: 1 } : egg
+    )));
+    setProgress((current) => {
+      const alreadyCollected = current.collected.some((item) => item.id === id);
+      return {
+        ...current,
+        collected: alreadyCollected
+          ? current.collected
+          : [...current.collected, { id, discoveredAt: new Date().toISOString() }],
+        totalDiscoveries: current.totalDiscoveries + 1,
+      };
+    });
+    if (progressRef.current.soundEnabled) playDiscoverySound();
+  }
+
+  function startNextRound() {
+    setRoundEggs(createRoundEggs(progressRef.current.collected.map((item) => item.id)));
+    setRoundComplete(null);
+  }
+
+  function toggleSound() {
+    setProgress((current) => ({ ...current, soundEnabled: !current.soundEnabled }));
+  }
+
+  function clearNotebook() {
+    const cleared = { ...EMPTY_PROGRESS, soundEnabled: progressRef.current.soundEnabled };
+    setProgress(cleared);
+    setRoundEggs(createRoundEggs([]));
+    setRoundComplete(null);
+  }
+
+  function replayCollectedEgg(egg: DetectiveEgg) {
+    setReplayEgg(egg);
+    if (progressRef.current.soundEnabled) playDiscoverySound();
+  }
+
   function updateLighting(patch: Partial<LightingSettings>) {
     setLighting((current) => ({ ...current, ...patch }));
   }
@@ -682,27 +856,45 @@ export function MorsLightCanvas() {
   }
 
   return (
-    <main
-      className={`experience-shell${ready ? " is-ready" : ""}`}
-      aria-label="Interactive HZC detective light playroom"
-      aria-busy={!ready && !error}
-    >
-      <canvas ref={canvasRef} className="webgl-canvas" aria-label="Interactive HZC detective light playroom">
-        <MorsPageSurface
-          sourceRef={pageSourceRef}
-          concept={concept}
-          lighting={lighting}
-          onConceptChange={setConcept}
-          onLightingChange={updateLighting}
-          onReset={resetLight}
-        />
-      </canvas>
+    <>
+      <main
+        className={`experience-shell${ready ? " is-ready" : ""}${roundComplete === "celebrating" ? " is-celebrating" : ""}`}
+        aria-label="Interactive HZC detective light playroom"
+        aria-busy={!ready && !error}
+      >
+        <canvas ref={canvasRef} className="webgl-canvas" aria-label="Interactive HZC detective light playroom">
+          <MorsPageSurface
+            sourceRef={pageSourceRef}
+            concept={concept}
+            lighting={lighting}
+            onConceptChange={setConcept}
+            onLightingChange={updateLighting}
+            onReset={resetLight}
+            eggs={roundEggs}
+            onEggUnlock={unlockEgg}
+          />
+        </canvas>
 
-      <MorsLightPreview hidden={ready || Boolean(error)} />
-      <div className={`scene-status${ready || error ? " is-hidden" : ""}`} aria-live="polite">
-        <span /> PREPARING HTML SURFACE
-      </div>
-      {error ? <div className="scene-error">{error}</div> : null}
-    </main>
+        <MorsLightPreview hidden={ready || Boolean(error)} />
+        <div className={`scene-status${ready || error ? " is-hidden" : ""}`} aria-live="polite">
+          <span /> PREPARING HTML SURFACE
+        </div>
+        {error ? <div className="scene-error">{error}</div> : null}
+      </main>
+      <DetectiveNotebook
+        open={notebookOpen}
+        progress={progress}
+        roundFound={roundFound}
+        soundEnabled={progress.soundEnabled}
+        onOpenChange={setNotebookOpen}
+        onReplay={replayCollectedEgg}
+        onClear={clearNotebook}
+        onSoundToggle={toggleSound}
+      />
+      {replayEgg ? <NotebookReplay egg={replayEgg} onClose={() => setReplayEgg(null)} /> : null}
+      {roundComplete === "ready" ? (
+        <RoundCompleteDialog onNextRound={startNextRound} />
+      ) : null}
+    </>
   );
 }

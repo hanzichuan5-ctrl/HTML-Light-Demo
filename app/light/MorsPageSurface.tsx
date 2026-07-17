@@ -8,6 +8,8 @@ import {
   type Concept,
   type LightingSettings,
 } from "./config";
+import { EasterEggLayer } from "./DetectiveExperience";
+import type { RoundEgg } from "./detective-eggs";
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -81,6 +83,8 @@ type MorsPageSurfaceProps = {
   onConceptChange: (concept: Concept) => void;
   onLightingChange: (patch: Partial<LightingSettings>) => void;
   onReset: () => void;
+  eggs?: RoundEgg[];
+  onEggUnlock?: (id: string) => void;
   preview?: boolean;
   sourceRef?: Ref<HTMLDivElement>;
 };
@@ -91,6 +95,8 @@ export function MorsPageSurface({
   onConceptChange,
   onLightingChange,
   onReset,
+  eggs = [],
+  onEggUnlock,
   preview = false,
   sourceRef,
 }: MorsPageSurfaceProps) {
@@ -122,6 +128,7 @@ export function MorsPageSurface({
         } as CSSProperties
       }
     >
+      {onEggUnlock ? <EasterEggLayer eggs={eggs} onUnlock={onEggUnlock} /> : null}
       <header className="page-header">
         <div className="page-brand">
           <span className="page-logo-wrap">
