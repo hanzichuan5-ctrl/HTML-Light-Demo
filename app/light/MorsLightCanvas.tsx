@@ -346,16 +346,20 @@ export function MorsLightCanvas() {
         previous.copy(position);
       }
 
-      const fitHeight = pageHeight + 3.1;
-      const fitWidth = pageWidth + 1.25;
+      // Fit the actual visible rig instead of applying a large fixed zoom-out.
+      // This keeps the page prominent across laptop and desktop aspect ratios
+      // while still reserving enough room for the cable above the lamp.
+      const sceneBottom = pageGroup.position.y - pageHeight / 2;
+      const sceneTop = anchor.y + 0.18;
+      const sceneCenterY = (sceneTop + sceneBottom) / 2;
+      const fitHeight = sceneTop - sceneBottom + (portrait ? 0.62 : 0.38);
+      const fitWidth = pageWidth + (portrait ? 0.72 : 0.42);
       const halfFov = THREE.MathUtils.degToRad(camera.fov * 0.5);
       const distanceForHeight = fitHeight / (2 * Math.tan(halfFov));
       const distanceForWidth = fitWidth / (2 * Math.tan(halfFov) * camera.aspect);
       const cameraDistance = Math.max(distanceForHeight, distanceForWidth);
-      const cameraDrop = portrait ? 0.78 : 0.62;
-      const upwardTarget = portrait ? -0.04 : 0.06;
-      camera.position.set(0, pageGroup.position.y - cameraDrop, cameraDistance);
-      camera.lookAt(0, pageGroup.position.y + upwardTarget, 0);
+      camera.position.set(0, sceneCenterY, cameraDistance);
+      camera.lookAt(0, sceneCenterY, 0);
       camera.updateMatrixWorld();
       interactions.update();
       canvas.requestPaint?.();
