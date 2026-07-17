@@ -34,7 +34,7 @@ export function MorsLightCanvas() {
   const activeColorRef = useRef(new THREE.Color());
   const wakeRef = useRef<(() => void) | null>(null);
   const resetMotionRef = useRef<(() => void) | null>(null);
-  const [concept, setConcept] = useState<Concept>("案件");
+  const [concept, setConcept] = useState<Concept>("??");
   const [lighting, setLighting] = useState<LightingSettings>(INITIAL_LIGHT);
   const lightingRef = useRef(lighting);
   const [htmlCanvasReady, setHtmlCanvasReady] = useState(false);
@@ -137,7 +137,7 @@ export function MorsLightCanvas() {
 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.NeutralToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 0.96;
     renderer.setClearColor(0x010204, 1);
 
     const scene = new THREE.Scene();
@@ -178,10 +178,10 @@ export function MorsLightCanvas() {
     backing.position.z = -0.035;
     pageGroup.add(backing);
 
-    const ambient = new THREE.HemisphereLight(0x9db6d9, 0x2a1b16, 1.08);
+    const ambient = new THREE.HemisphereLight(0x9db6d9, 0x140c09, 0.36);
     scene.add(ambient);
 
-    const fillLight = new THREE.DirectionalLight(0xaec7ef, 0.42);
+    const fillLight = new THREE.DirectionalLight(0xaec7ef, 0.12);
     fillLight.position.set(-4.8, 5.6, 7.4);
     scene.add(fillLight);
 

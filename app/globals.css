@@ -36,7 +36,7 @@ button {
   overflow: hidden;
   isolation: isolate;
   background:
-    linear-gradient(180deg, rgba(19, 38, 66, 0.72), rgba(5, 7, 13, 0.94) 46%, #05070d),
+    linear-gradient(180deg, rgba(7, 14, 26, 0.82), rgba(3, 5, 10, 0.98) 46%, #02040a),
     #05070d;
 }
 
@@ -47,8 +47,8 @@ button {
   pointer-events: none;
   content: "";
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 22%),
-    linear-gradient(90deg, rgba(86, 137, 190, 0.13), transparent 28%, transparent 70%, rgba(255, 203, 110, 0.11));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 22%),
+    linear-gradient(90deg, rgba(86, 137, 190, 0.055), transparent 28%, transparent 70%, rgba(255, 203, 110, 0.045));
   mix-blend-mode: screen;
 }
 
@@ -108,9 +108,9 @@ button {
   border-radius: 24px;
   color: #f7f7fb;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(135deg, #101827 0%, #08111e 43%, #150f17 100%);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(135deg, #070c15 0%, #030914 43%, #0b0710 100%);
   background-size: 48px 48px, 48px 48px, auto;
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.025),
@@ -124,7 +124,7 @@ button {
   inset: 0;
   pointer-events: none;
   content: "";
-  opacity: 0.17;
+  opacity: 0.1;
   background-image: radial-gradient(rgba(255, 255, 255, 0.34) 0.65px, transparent 0.65px);
   background-size: 8px 8px;
   mask-image: linear-gradient(145deg, black, transparent 72%);
@@ -328,7 +328,7 @@ button {
 .investigation-stage {
   position: relative;
   aspect-ratio: 1;
-  width: min(100%, 430px);
+  width: min(100%, 400px);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 8px;
@@ -344,14 +344,177 @@ button {
   object-fit: cover;
 }
 
+.case-clue-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 112px;
+}
+
+.case-clue-card:not(.is-empty) {
+  border-color: color-mix(in srgb, var(--lamp-color) 52%, transparent);
+  background: color-mix(in srgb, var(--lamp-color) 8%, rgba(6, 11, 20, 0.78));
+}
+
+.case-clue-card:not(.is-empty)::after {
+  position: absolute;
+  right: -26px;
+  bottom: -38px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  pointer-events: none;
+  content: "";
+  background: radial-gradient(circle, color-mix(in srgb, var(--lamp-color) 18%, transparent), transparent 66%);
+}
+
+.case-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.case-card-header > span {
+  color: rgba(246, 247, 251, 0.58);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.evidence-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.evidence-board > div {
+  min-width: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 6px;
+  color: rgba(241, 243, 249, 0.31);
+  background: rgba(255, 255, 255, 0.022);
+  overflow: hidden;
+}
+
+.evidence-board > div.is-found {
+  border-color: color-mix(in srgb, var(--lamp-color) 42%, transparent);
+  color: rgba(246, 248, 253, 0.82);
+  background: color-mix(in srgb, var(--lamp-color) 9%, rgba(255, 255, 255, 0.025));
+}
+
+.evidence-board b {
+  flex: 0 0 auto;
+  color: color-mix(in srgb, var(--lamp-color) 78%, #ffffff);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+}
+
+.evidence-board span {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 660;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deduction-card {
+  padding: 11px;
+  border: 1px solid color-mix(in srgb, var(--lamp-color) 42%, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--lamp-color) 7%, rgba(6, 11, 20, 0.84));
+}
+
+.deduction-card > p {
+  margin: 0 0 9px;
+  color: color-mix(in srgb, var(--lamp-color) 82%, #ffffff);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.suspect-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.suspect-options button,
+.replay-case {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 6px;
+  color: rgba(245, 247, 252, 0.72);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.suspect-options button {
+  min-width: 0;
+  min-height: 46px;
+  padding: 7px 5px;
+  text-align: center;
+}
+
+.suspect-options button:hover,
+.replay-case:hover {
+  border-color: color-mix(in srgb, var(--lamp-color) 58%, transparent);
+  color: #fff;
+  background: color-mix(in srgb, var(--lamp-color) 12%, rgba(255, 255, 255, 0.045));
+}
+
+.suspect-options b,
+.suspect-options span {
+  display: block;
+}
+
+.suspect-options b {
+  font-size: 11px;
+}
+
+.suspect-options span {
+  margin-top: 4px;
+  color: rgba(245, 247, 252, 0.4);
+  font-size: 9px;
+}
+
+.deduction-card.is-solved {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.deduction-card.is-solved > p {
+  margin: 0;
+}
+
+.replay-case {
+  min-width: 104px;
+  height: 34px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.replay-case span {
+  margin-left: 6px;
+  color: color-mix(in srgb, var(--lamp-color) 78%, #ffffff);
+}
+
 .investigation-stage::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
   content: "";
   background:
-    linear-gradient(180deg, rgba(4, 8, 15, 0.02), rgba(4, 8, 15, 0.34)),
-    linear-gradient(90deg, rgba(4, 8, 15, 0.2), transparent 38%, rgba(4, 8, 15, 0.16));
+    linear-gradient(180deg, rgba(2, 5, 10, 0.24), rgba(2, 5, 10, 0.58)),
+    linear-gradient(90deg, rgba(2, 5, 10, 0.42), rgba(2, 5, 10, 0.08) 38%, rgba(2, 5, 10, 0.36));
   mix-blend-mode: multiply;
 }
 
@@ -772,7 +935,8 @@ button {
   .page-main {
     height: 1000px;
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     align-items: stretch;
     gap: 14px;
     padding: 26px 30px 104px;
@@ -819,11 +983,12 @@ button {
 
   .investigation-panel {
     justify-items: center;
+    align-content: start;
     gap: 10px;
   }
 
   .investigation-stage {
-    width: min(100%, 300px);
+    width: min(100%, 330px);
   }
 
   .clue-card {
@@ -842,8 +1007,7 @@ button {
   }
 
   .light-controls {
-    align-self: start;
-    padding: 14px;
+    display: none;
   }
 
   .control-heading {
@@ -881,6 +1045,117 @@ button {
     max-width: 210px;
     line-height: 1.6;
   }
+}
+
+/* HTMLTexture is rasterized in a 720px-wide SVG viewport, so runtime compact
+   styles mirror the mobile media query for the in-canvas surface. */
+.page-source.is-compact {
+  width: 720px;
+  height: 1180px;
+  border-radius: 26px;
+  background-size: 42px 42px, 42px 42px, auto;
+}
+
+.page-source.is-compact .page-header {
+  height: 82px;
+  padding: 0 30px;
+}
+
+.page-source.is-compact .page-brand-suffix,
+.page-source.is-compact .page-status {
+  font-size: 8px;
+}
+
+.page-source.is-compact .page-main {
+  height: 1000px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 14px;
+  padding: 26px 30px 104px;
+}
+
+.page-source.is-compact .page-copy h1 {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.page-source.is-compact .mouse-king {
+  margin-top: 12px;
+  padding: 6px 10px;
+  font-size: 15px;
+}
+
+.page-source.is-compact .page-subtitle {
+  margin-top: 12px;
+  max-width: 100%;
+  font-size: 16px;
+}
+
+.page-source.is-compact .case-summary {
+  margin-top: 16px;
+}
+
+.page-source.is-compact .case-files {
+  gap: 6px;
+}
+
+.page-source.is-compact .case-files button {
+  min-width: 72px;
+  height: 32px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.page-source.is-compact .case-description {
+  max-width: 100%;
+  min-height: 0;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.page-source.is-compact .investigation-panel {
+  justify-items: center;
+  align-content: start;
+  gap: 10px;
+}
+
+.page-source.is-compact .investigation-stage {
+  width: min(100%, 330px);
+}
+
+.page-source.is-compact .clue-card {
+  width: min(100%, 520px);
+  min-height: 82px;
+  padding: 11px 13px 12px;
+}
+
+.page-source.is-compact .clue-card h2 {
+  font-size: 18px;
+}
+
+.page-source.is-compact .clue-card span {
+  font-size: 12px;
+  line-height: 1.42;
+}
+
+.page-source.is-compact .light-controls {
+  display: none;
+}
+
+.page-source.is-compact .page-footer {
+  height: 98px;
+  grid-template-columns: 1fr auto;
+  padding: 0 30px;
+}
+
+.page-source.is-compact .page-footer > p:first-child {
+  display: none;
+}
+
+.page-source.is-compact .page-footer > p:last-child {
+  max-width: 210px;
+  line-height: 1.6;
 }
 
 @media (min-width: 701px) and (max-width: 1100px) {
