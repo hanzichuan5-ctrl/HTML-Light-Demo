@@ -21,21 +21,22 @@ export const metadata: Metadata = {
   },
   description: "菠萝包和さと的侦探搭档灯光互动页面。",
   icons: {
-    icon: publicAsset("/mors-logo.svg"),
-    shortcut: publicAsset("/mors-logo.svg"),
+    icon: publicAsset("/hzc-logo.png"),
+    shortcut: publicAsset("/hzc-logo.png"),
+    apple: publicAsset("/hzc-logo.png"),
   },
   openGraph: {
     title: "HZC Detective Playroom",
     description: "菠萝包和さと的侦探搭档灯光互动页面。",
     type: "website",
     url: siteUrl,
-    images: [{ url: publicAsset("/20260716-231908.jpg"), width: 1230, height: 1230, alt: "菠萝包和さと的侦探搭档合照。" }],
+    images: [{ url: publicAsset("/og.jpg"), width: 1200, height: 630, alt: "菠萝包和さと的侦探搭档灯光互动页面。" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "HZC Detective Playroom",
     description: "菠萝包和さと的侦探搭档灯光互动页面。",
-    images: [publicAsset("/20260716-231908.jpg")],
+    images: [publicAsset("/og.jpg")],
   },
 };
 

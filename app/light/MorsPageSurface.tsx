@@ -134,7 +134,7 @@ export function MorsPageSurface({
           <span className="page-logo-wrap">
             {/* The logo is captured by HTMLTexture, so it must remain a plain DOM image. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`${BASE_PATH}/mors-logo.svg`} alt="" />
+            <img src={`${BASE_PATH}/hzc-logo.png`} alt="" />
           </span>
           <span>HZC</span>
           <span className="page-brand-suffix">DETECTIVE LIGHT</span>
