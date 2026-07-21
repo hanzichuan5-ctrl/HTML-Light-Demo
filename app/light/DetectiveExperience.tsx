@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { DETECTIVE_EGGS, type DetectiveEgg, type RoundEgg } from "./detective-eggs";
 import type { DetectiveProgress } from "./detective-storage";
 
@@ -109,28 +109,45 @@ export function DetectiveNotebook({
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
+  function handleDialogClick(event: MouseEvent<HTMLDialogElement>) {
+    // Close when clicking outside the dialog content (backdrop click).
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    const isInsideDialog =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+    if (!isInsideDialog) {
+      onOpenChange(false);
+    }
+  }
+
   return (
-    <div className="detective-dock" data-ui-overlay>
-      <button
-        type="button"
-        className="notebook-trigger"
-        onClick={() => onOpenChange(!open)}
-        aria-expanded={open}
-        aria-controls="detective-notebook"
-      >
-        <span aria-hidden="true">▤</span>
-        <b>侦探手册</b>
-        <small>{roundFound}/6</small>
-      </button>
-      <button
-        type="button"
-        className="sound-toggle"
-        onClick={onSoundToggle}
-        aria-label={soundEnabled ? "关闭音效" : "开启音效"}
-        aria-pressed={soundEnabled}
-      >
-        {soundEnabled ? "♪" : "×"}
-      </button>
+    <>
+      <div className="detective-dock" data-ui-overlay>
+        <button
+          type="button"
+          className="notebook-trigger"
+          onClick={() => onOpenChange(!open)}
+          aria-expanded={open}
+          aria-controls="detective-notebook"
+        >
+          <span aria-hidden="true">▤</span>
+          <b>侦探手册</b>
+          <small>{roundFound}/6</small>
+        </button>
+        <button
+          type="button"
+          className="sound-toggle"
+          onClick={onSoundToggle}
+          aria-label={soundEnabled ? "关闭音效" : "开启音效"}
+          aria-pressed={soundEnabled}
+        >
+          {soundEnabled ? "♪" : "×"}
+        </button>
+      </div>
 
       <dialog
         ref={dialogRef}
@@ -138,13 +155,23 @@ export function DetectiveNotebook({
         className="detective-notebook"
         aria-label="侦探手册"
         onClose={() => onOpenChange(false)}
+        onClick={handleDialogClick}
       >
           <header>
             <div>
               <p>DETECTIVE ARCHIVE</p>
               <h2>侦探手册</h2>
             </div>
-            <button type="button" onClick={() => onOpenChange(false)} aria-label="关闭侦探手册">×</button>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpenChange(false);
+              }}
+              aria-label="关闭侦探手册"
+            >
+              ×
+            </button>
           </header>
 
           <div className="notebook-stats">
@@ -185,7 +212,7 @@ export function DetectiveNotebook({
             )}
           </footer>
       </dialog>
-    </div>
+    </>
   );
 }
 

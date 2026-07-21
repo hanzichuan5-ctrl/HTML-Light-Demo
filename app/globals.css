@@ -420,14 +420,26 @@ button {
 .detective-notebook header h2 { margin-top: 5px; font-size: 21px; }
 .detective-notebook header button,
 .notebook-replay > button {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 50%;
   color: rgba(255, 255, 255, 0.74);
   background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
+  touch-action: manipulation;
+  transition: color 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.detective-notebook header button:hover,
+.detective-notebook header button:focus-visible,
+.notebook-replay > button:hover,
+.notebook-replay > button:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+  outline: none;
 }
 
 .notebook-stats {
