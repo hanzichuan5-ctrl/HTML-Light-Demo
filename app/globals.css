@@ -406,6 +406,16 @@ button {
   animation: notebook-open 240ms ease-out;
 }
 
+/* Restore UA stylesheet behavior: hide closed dialogs.
+   Without this, .detective-notebook's `display: flex` wins against
+   the user agent's `:not([open]) { display: none }` rule, leaving
+   the dialog visually visible after dialog.close(). */
+.detective-notebook:not([open]),
+.notebook-replay:not([open]),
+.round-complete:not([open]) {
+  display: none;
+}
+
 .detective-notebook > header {
   display: flex;
   align-items: center;
